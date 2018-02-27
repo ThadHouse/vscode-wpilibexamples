@@ -2,7 +2,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import * as net from 'net';
+import * as path from 'path';
+import { RioLog } from './riolog';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -12,21 +13,8 @@ export function activate(context: vscode.ExtensionContext) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "vscode-wpilibexamples" is now active!');
 
-    let outputChannel = vscode.window.createOutputChannel('RioLog');
-
-    let socket = net.createConnection({ port: 6666, host: "127.0.0.1"}, () => {
-        outputChannel.appendLine("Client Connected");
-    });
-
-    socket.on('data', (data) => {
-        outputChannel.appendLine(data.toString());
-    });
-
-
-
-    outputChannel.show();
-
-    context.subscriptions.push(outputChannel);
+    let riolog = new RioLog();
+    context.subscriptions.push(riolog);
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
@@ -75,6 +63,28 @@ export function activate(context: vscode.ExtensionContext) {
         // Display a message box to the user
         vscode.window.showInformationMessage('New command: type = ' + typeSelection + " name = " + nameSelection);
     }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('extension.startRioLog', async () => {
+        // The code you place here will be executed every time your command is executed
+        let teamNum = await vscode.window.showInputBox({ prompt: "Please enter your team number"});
+
+        if (teamNum === undefined) {
+            console.log('no team number entered');
+            return;
+        }
+
+        let extension = vscode.extensions.getExtension("thadhouse.vscode-wpilibexamples");
+
+        if (extension === undefined) {
+            vscode.window.showErrorMessage("Unable to find extension");
+            return;
+        }
+
+        const fullPath = path.join(extension.extensionPath) + "/jars/riolog/bin/riolog.bat";
+
+        riolog.connect(teamNum, fullPath);
+    }));
+
 }
 
 // this method is called when your extension is deactivated

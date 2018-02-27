@@ -40,6 +40,11 @@
                 "command": "extension.createCommand",
                 "title": "Create Command",
                 "category": "wpilib"
+            },
+            {
+                "command": "extension.startRioLog",
+                "title": "Start RioLog",
+                "category": "wpilib"
             }
         ],
         "menus": {
@@ -59,6 +64,10 @@
                 {
                     "group": "wpilib",
                     "command": "extension.setTeamNumber"
+                },
+                {
+                    "group": "wpilib",
+                    "command": "extension.startRioLog"
                 }
             ],
             "explorer/context": [
